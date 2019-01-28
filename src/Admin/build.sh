@@ -12,7 +12,7 @@ dotnet restore $DIR/Admin.csproj
 echo "Clean"
 dotnet clean $DIR/Admin.csproj -c "Release" -o $DIR/obj/Docker/publish
 echo "Node Build"
-npm --prefix $DIR install $DIR
+MAKEFLAGS=-j$(nproc) npm --prefix $DIR install $DIR
 gulp --gulpfile $DIR/gulpfile.js build
 echo "Publish"
 dotnet publish $DIR/Admin.csproj -c "Release" -o $DIR/obj/Docker/publish

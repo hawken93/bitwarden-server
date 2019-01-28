@@ -136,8 +136,6 @@ namespace Bit.Setup
 
         public class Installation
         {
-            public Guid InstallationId { get; set; }
-            public string InstallationKey { get; set; }
             public bool DiffieHellman { get; set; }
             public bool Trusted { get; set; }
             public bool SelfSignedCert { get; set; }

@@ -64,11 +64,6 @@ namespace Bit.Setup
                 _context.Install.Domain = _context.Parameters["domain"].ToLowerInvariant();
             }
 
-            if(!ValidateInstallation())
-            {
-                return;
-            }
-
             var certBuilder = new CertBuilder(_context);
             certBuilder.BuildForInstall();
 
@@ -199,54 +194,6 @@ namespace Bit.Setup
                 }
 
                 throw e;
-            }
-        }
-
-        private static bool ValidateInstallation()
-        {
-            var installationId = Helpers.ReadInput("Enter your installation id (get at https://bitwarden.com/host)");
-            if(!Guid.TryParse(installationId.Trim(), out var installationidGuid))
-            {
-                Console.WriteLine("Invalid installation id.");
-                return false;
-            }
-
-            _context.Install.InstallationId = installationidGuid;
-            _context.Install.InstallationKey = Helpers.ReadInput("Enter your installation key");
-
-            try
-            {
-                var response = new HttpClient().GetAsync("https://api.bitwarden.com/installations/" +
-                    _context.Install.InstallationId).GetAwaiter().GetResult();
-
-                if(!response.IsSuccessStatusCode)
-                {
-                    if(response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                    {
-                        Console.WriteLine("Invalid installation id.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Unable to validate installation id.");
-                    }
-
-                    return false;
-                }
-
-                var resultString = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-                var result = JsonConvert.DeserializeObject<dynamic>(resultString);
-                if(!(bool)result.Enabled)
-                {
-                    Console.WriteLine("Installation id has been disabled.");
-                    return false;
-                }
-
-                return true;
-            }
-            catch
-            {
-                Console.WriteLine("Unable to validate installation id. Problem contacting Bitwarden server.");
-                return false;
             }
         }
 
